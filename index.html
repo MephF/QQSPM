@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Quién Quiere Ser Programador Millonario?</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="game-container">
+    <h1>¿Quién Quiere Ser Programador Millonario?</h1>
+    <div id="game-area" style="display: none;">
+        <div id="question-container">
+            <p id="question"></p>
+            <div id="answers"></div>
+        </div>
+        <div id="info-panel">
+            <div id="timer">Tiempo: <span id="time">45</span>s</div>
+            <div id="score">Puntuación: $<span id="score-value">0</span></div>
+            <div id="level">Nivel: <span id="level-value">1</span></div>
+        </div>
+        <div id="lifelines">
+            <button id="friend">👥 Llamar a un Amigo</button>
+            <button id="audience">📊 Ayuda del Público</button>
+            <button id="fifty-fifty">50:50</button>
+            <button id="change-question">🔄 Cambiar Pregunta</button>
+        </div>
+        <div id="game-controls">
+            <button id="quit-game">Retirarse</button>
+        </div>
+        <div id="message"></div>
+    </div>
+    <div id="start-screen">
+        <button id="start-game">Iniciar Juego</button>
+    </div>
+    <div id="end-screen" style="display: none;">
+        <h2>Juego Terminado</h2>
+        <p id="final-score"></p>
+        <button id="play-again">Jugar de Nuevo</button>
+    </div>
+</div>
+<script src="js/index.js"></script>
+</body>
+</html>
