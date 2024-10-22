@@ -21,10 +21,10 @@
 ## Instalación
 
 1. Clona este repositorio:
--git clone https://github.com/MephF/QQSPM.git
+git clone https://github.com/MephF/QQSPM.git
 
 2. Navega al directorio del proyecto:
--cd quien-quiere-ser-programador-millonario
+cd quien-quiere-ser-programador-millonario
 
 3. Abre el archivo `index.html` en tu navegador web preferido.
 
