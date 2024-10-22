@@ -37,6 +37,12 @@ const questions = [
         answers: ["Atomicity, Consistency, Isolation, Durability", "Advanced Computer Interface Design", "Automated Code Integration and Deployment", "Algorithm Complexity in Databases"],
         correct: 0,
         level: 3
+    },
+    {
+        question: "¿Cuál de las siguientes opciones NO es un paradigma de programación?",
+        answers: ["Programación Orientada a Objetos (POO)", "Programación Funcional", "Programación Lógica", "Compilación Automática de Código (CAC)"],
+        correct: 2,
+        level: 3
     }
 ];
 
@@ -77,7 +83,7 @@ document.getElementById('change-question').addEventListener('click', () => useLi
 function startGame() {
     currentQuestion = 0;
     score = 0;
-    lifelinesUsed = {friend: false, audience: false, fiftyFifty: false, changeQuestion: false};
+    lifelinesUsed = { friend: false, audience: false, fiftyFifty: false, changeQuestion: false };
     updateScore();
     updateLevel();
     startScreen.style.display = 'none';
@@ -186,7 +192,7 @@ function useLifeline(lifeline) {
     lifelinesUsed[lifeline] = true;
     document.getElementById(lifeline === 'fiftyFifty' ? 'fifty-fifty' : lifeline).disabled = true;
 
-    switch(lifeline) {
+    switch (lifeline) {
         case 'friend':
             messageEl.textContent = 'Tu amigo sugiere: ' + questions[currentQuestion].answers[questions[currentQuestion].correct];
             break;
@@ -226,3 +232,45 @@ function generateAudienceHelp() {
     }
     return percentages;
 }
+
+//MUSICA
+document.addEventListener("DOMContentLoaded", function () {
+    const audio = document.getElementById("background-music");
+    const toggleAudioButton = document.getElementById("toggle-audio");
+    const startGameButton = document.getElementById("start-game");
+    const quitGameButton = document.getElementById("quit-game"); // Botón "Retirarse"
+    let isAudioPlaying = false;
+
+    // Iniciar el juego y la música cuando el usuario haga clic en "Iniciar Juego"
+    startGameButton.addEventListener("click", function () {
+        audio.play().then(() => {
+            isAudioPlaying = true;
+            toggleAudioButton.textContent = '🔊'; 
+        }).catch(error => {
+            console.error("Error al intentar reproducir la música: ", error);
+        });
+    });
+
+    toggleAudioButton.addEventListener("click", function () {
+        if (isAudioPlaying) {
+            audio.pause();
+            toggleAudioButton.textContent = '🔇';
+        } else {
+            audio.play().then(() => {
+                toggleAudioButton.textContent = '🔊';
+            }).catch(error => {
+                console.error("Error al intentar reproducir la música: ", error);
+            });
+        }
+        isAudioPlaying = !isAudioPlaying;
+    });
+
+    quitGameButton.addEventListener("click", function () {
+        if (isAudioPlaying) {
+            audio.pause();
+            isAudioPlaying = false; 
+            toggleAudioButton.textContent = '🔇'; 
+        }
+    });
+});
+
