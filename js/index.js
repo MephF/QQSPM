@@ -46,6 +46,8 @@ const questions = [
     }
 ];
 
+// Entre 15 y 20 Preguntas en total
+
 let currentQuestion = 0;
 let score = 0;
 let timer;
@@ -188,6 +190,8 @@ function enableLifelines() {
     document.getElementById('change-question').disabled = lifelinesUsed.changeQuestion;
 }
 
+//COMODINES
+
 function useLifeline(lifeline) {
     lifelinesUsed[lifeline] = true;
     document.getElementById(lifeline === 'fiftyFifty' ? 'fifty-fifty' : lifeline).disabled = true;
@@ -220,6 +224,7 @@ function useLifeline(lifeline) {
     }
 }
 
+// deshabilitar
 function generateAudienceHelp() {
     const correct = questions[currentQuestion].correct;
     const percentages = [0, 0, 0, 0];
