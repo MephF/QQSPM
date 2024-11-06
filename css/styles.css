@@ -1,16 +1,31 @@
+:root {
+    --bg-color: #1e1e1e;
+    --text-color: #00ff00;
+    --container-bg: #2d2d2d;
+    --button-bg: #4d4d4d;
+    --button-hover-bg: #00ff00;
+    --button-hover-text: #1e1e1e;
+    --disabled-bg: #3d3d3d;
+    --disabled-text: #666;
+    --correct-bg: #00ff00;
+    --incorrect-bg: #ff0000;
+}
+
 body {
     font-family: 'Courier New', monospace;
-    background-color: #1e1e1e;
-    color: #00ff00;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 #game-container {
-    background-color: #2d2d2d;
+    background-color: var(--container-bg);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
@@ -20,43 +35,43 @@ body {
 
 h1, h2 {
     text-align: center;
-    color: #00ff00;
-    text-shadow: 0 0 5px #00ff00;
+    color: var(--text-color);
+    text-shadow: 0 0 5px var(--text-color);
 }
 
 #question-container {
     margin-bottom: 20px;
-    background-color: #3d3d3d;
+    background-color: var(--disabled-bg);
     padding: 15px;
     border-radius: 5px;
 }
 
 #answers {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
 }
 
 button {
-    background-color: #4d4d4d;
-    color: #00ff00;
-    border: 1px solid #00ff00;
+    background-color: var(--button-bg);
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s;
-    font-family: 'Courier New', monospace;
+    font-family: inherit;
 }
 
-button:hover {
-    background-color: #00ff00;
-    color: #1e1e1e;
+button:hover:not(:disabled) {
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
 }
 
 button:disabled {
-    background-color: #3d3d3d;
-    color: #666;
-    border-color: #666;
+    background-color: var(--disabled-bg);
+    color: var(--disabled-text);
+    border-color: var(--disabled-text);
     cursor: not-allowed;
 }
 
@@ -91,26 +106,59 @@ button:disabled {
 }
 
 .correct {
-    background-color: #00ff00;
-    color: #1e1e1e;
+    background-color: var(--correct-bg);
+    color: var(--button-hover-text);
 }
 
 .incorrect {
-    background-color: #ff0000;
+    background-color: var(--incorrect-bg);
     color: #ffffff;
 }
-
 
 #audio-controls {
     position: absolute;
     top: 10px;
     right: 10px;
 }
-    
-    #audio-controls button {
+
+#audio-controls button {
     background: none;
     border: none;
     font-size: 24px;
     cursor: pointer;
 }
-    
+
+#lifeline-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.center-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#start-screen, #game-area, #end-screen {
+    width: 100%;
+}
+
+@media (max-width: 600px) {
+    #answers {
+        grid-template-columns: 1fr;
+    }
+
+    #lifelines {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #lifelines button {
+        margin-bottom: 10px;
+    }
+}

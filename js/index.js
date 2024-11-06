@@ -1,281 +1,253 @@
-const questions = [
-    // Nivel 1: Fácil
-    {
-        question: "¿Qué significa HTML?",
-        answers: ["Hyper Text Markup Language", "High Tech Modern Language", "Hyper Transfer Markup Language", "Home Tool Markup Language"],
-        correct: 0,
-        level: 1
-    },
-    {
-        question: "¿Cuál es el lenguaje de programación más popular para desarrollo web frontend?",
-        answers: ["Java", "Python", "JavaScript", "C++"],
-        correct: 2,
-        level: 1
-    },
-    // Nivel 2: Medio
-    {
-        question: "¿Qué significa CSS?",
-        answers: ["Computer Style Sheets", "Creative Style Sheets", "Cascading Style Sheets", "Colorful Style Sheets"],
-        correct: 2,
-        level: 2
-    },
-    {
-        question: "¿Cuál de los siguientes no es un tipo de dato en JavaScript?",
-        answers: ["Number", "Boolean", "String", "Float"],
-        correct: 3,
-        level: 2
-    },
-    // Nivel 3: Difícil
-    {
-        question: "¿Qué es una closure en JavaScript?",
-        answers: ["Un error en el código", "Una función que tiene acceso a variables en su ámbito léxico", "Un tipo de bucle", "Un método para cerrar una conexión"],
-        correct: 1,
-        level: 3
-    },
-    {
-        question: "¿Qué significa ACID en el contexto de bases de datos?",
-        answers: ["Atomicity, Consistency, Isolation, Durability", "Advanced Computer Interface Design", "Automated Code Integration and Deployment", "Algorithm Complexity in Databases"],
-        correct: 0,
-        level: 3
-    },
-    {
-        question: "¿Cuál de las siguientes opciones NO es un paradigma de programación?",
-        answers: ["Programación Orientada a Objetos (POO)", "Programación Funcional", "Programación Lógica", "Compilación Automática de Código (CAC)"],
-        correct: 2,
-        level: 3
-    }
-];
+document.addEventListener('DOMContentLoaded', () => {
+    const gameState = {
+        currentQuestion: 0,
+        score: 0,
+        timeLeft: 45,
+        lifelinesUsed: { friend: false, audience: false, fiftyFifty: false, changeQuestion: false },
+        timer: null,
+        isLifelineActive: false,
+        fiftyFiftyUsed: false,
+        lifelineUsedThisQuestion: false
+    };
 
-// Entre 15 y 20 Preguntas en total
+    const LIFELINE_COST = 500; // Costo de usar un comodín
 
-let currentQuestion = 0;
-let score = 0;
-let timer;
-let timeLeft = 45;
-let lifelinesUsed = {
-    friend: false,
-    audience: false,
-    fiftyFifty: false,
-    changeQuestion: false
-};
+    const elements = {
+        questionEl: document.getElementById('question'),
+        answersEl: document.getElementById('answers'),
+        timerEl: document.getElementById('time'),
+        scoreEl: document.getElementById('score-value'),
+        levelEl: document.getElementById('level-value'),
+        messageEl: document.getElementById('message'),
+        startButton: document.getElementById('start-game'),
+        quitButton: document.getElementById('quit-game'),
+        gameArea: document.getElementById('game-area'),
+        startScreen: document.getElementById('start-screen'),
+        endScreen: document.getElementById('end-screen'),
+        finalScoreEl: document.getElementById('final-score'),
+        playAgainButton: document.getElementById('play-again'),
+        audio: document.getElementById('background-music'),
+        toggleAudioButton: document.getElementById('toggle-audio'),
+        lifelineActions: document.getElementById('lifeline-actions'),
+        lifelineMessage: document.getElementById('lifeline-message'),
+        acceptLifeline: document.getElementById('accept-lifeline')
+    };
 
-const questionEl = document.getElementById('question');
-const answersEl = document.getElementById('answers');
-const timerEl = document.getElementById('time');
-const scoreEl = document.getElementById('score-value');
-const levelEl = document.getElementById('level-value');
-const messageEl = document.getElementById('message');
-const startButton = document.getElementById('start-game');
-const quitButton = document.getElementById('quit-game');
-const gameArea = document.getElementById('game-area');
-const startScreen = document.getElementById('start-screen');
-const endScreen = document.getElementById('end-screen');
-const finalScoreEl = document.getElementById('final-score');
-const playAgainButton = document.getElementById('play-again');
-
-startButton.addEventListener('click', startGame);
-quitButton.addEventListener('click', quitGame);
-playAgainButton.addEventListener('click', startGame);
-
-document.getElementById('friend').addEventListener('click', () => useLifeline('friend'));
-document.getElementById('audience').addEventListener('click', () => useLifeline('audience'));
-document.getElementById('fifty-fifty').addEventListener('click', () => useLifeline('fiftyFifty'));
-document.getElementById('change-question').addEventListener('click', () => useLifeline('changeQuestion'));
-
-function startGame() {
-    currentQuestion = 0;
-    score = 0;
-    lifelinesUsed = { friend: false, audience: false, fiftyFifty: false, changeQuestion: false };
-    updateScore();
-    updateLevel();
-    startScreen.style.display = 'none';
-    endScreen.style.display = 'none';
-    gameArea.style.display = 'block';
-    nextQuestion();
-}
-
-function nextQuestion() {
-    if (currentQuestion >= questions.length) {
-        endGame();
-        return;
-    }
-
-    const question = questions[currentQuestion];
-    questionEl.textContent = question.question;
-    answersEl.innerHTML = '';
-
-    question.answers.forEach((answer, index) => {
-        const button = document.createElement('button');
-        button.textContent = answer;
-        button.addEventListener('click', () => selectAnswer(index));
-        answersEl.appendChild(button);
-    });
-
-    resetTimer();
-    messageEl.textContent = '';
-    enableLifelines();
-}
-
-function selectAnswer(index) {
-    clearInterval(timer);
-    const question = questions[currentQuestion];
-    const buttons = answersEl.getElementsByTagName('button');
-
-    if (index === question.correct) {
-        score += question.level * 1000;
-        updateScore();
-        buttons[index].classList.add('correct');
-        messageEl.textContent = '¡Correcto!';
-        setTimeout(() => {
-            if (confirm('¡Respuesta correcta! ¿Quieres continuar jugando?')) {
-                currentQuestion++;
-                updateLevel();
-                nextQuestion();
-            } else {
-                endGame();
-            }
-        }, 1500);
-    } else {
-        buttons[index].classList.add('incorrect');
-        buttons[question.correct].classList.add('correct');
-        messageEl.textContent = 'Incorrecto. La respuesta correcta era: ' + question.answers[question.correct];
-        setTimeout(endGame, 2000);
-    }
-
-    for (let button of buttons) {
-        button.disabled = true;
-    }
-}
-
-function resetTimer() {
-    clearInterval(timer);
-    timeLeft = 45;
-    timerEl.textContent = timeLeft;
-    timer = setInterval(() => {
-        timeLeft--;
-        timerEl.textContent = timeLeft;
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            messageEl.textContent = '¡Se acabó el tiempo!';
-            endGame();
+    const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
-    }, 1000);
-}
+    };
 
-function updateScore() {
-    scoreEl.textContent = score;
-}
+    const getQuestionsForLevel = (level) => {
+        const levelQuestions = questions.filter(q => q.level === level);
+        shuffleArray(levelQuestions);
+        return levelQuestions.slice(0, 10);
+    };
 
-function updateLevel() {
-    levelEl.textContent = currentQuestion < questions.length ? questions[currentQuestion].level : 3;
-}
+    let gameQuestions = [];
 
-function endGame() {
-    clearInterval(timer);
-    gameArea.style.display = 'none';
-    endScreen.style.display = 'block';
-    finalScoreEl.textContent = `Tu puntuación final es: $${score}`;
-}
+    const startGame = () => {
+        gameState.currentQuestion = 0;
+        gameState.score = 0;
+        gameState.lifelinesUsed = { friend: false, audience: false, fiftyFifty: false, changeQuestion: false };
+        gameState.fiftyFiftyUsed = false;
+        gameState.lifelineUsedThisQuestion = false;
+        gameQuestions = [
+            ...getQuestionsForLevel(1),
+            ...getQuestionsForLevel(2),
+            ...getQuestionsForLevel(3)
+        ];
+        updateScore();
+        updateLevel();
+        elements.startScreen.classList.add('hidden');
+        elements.endScreen.classList.add('hidden');
+        elements.gameArea.classList.remove('hidden');
+        playBackgroundMusic();
+        nextQuestion();
+    };
 
-function quitGame() {
-    if (confirm('¿Estás seguro de que quieres retirarte?')) {
-        endGame();
-    }
-}
+    const nextQuestion = () => {
+        if (gameState.currentQuestion >= gameQuestions.length) {
+            endGame();
+            return;
+        }
 
-function enableLifelines() {
-    document.getElementById('friend').disabled = lifelinesUsed.friend;
-    document.getElementById('audience').disabled = lifelinesUsed.audience;
-    document.getElementById('fifty-fifty').disabled = lifelinesUsed.fiftyFifty;
-    document.getElementById('change-question').disabled = lifelinesUsed.changeQuestion;
-}
+        const question = gameQuestions[gameState.currentQuestion];
+        elements.questionEl.textContent = question.question;
+        elements.answersEl.innerHTML = '';
 
-//COMODINES
+        question.answers.forEach((answer, index) => {
+            const button = document.createElement('button');
+            button.textContent = answer;
+            button.addEventListener('click', () => selectAnswer(index));
+            elements.answersEl.appendChild(button);
+        });
 
-function useLifeline(lifeline) {
-    lifelinesUsed[lifeline] = true;
-    document.getElementById(lifeline === 'fiftyFifty' ? 'fifty-fifty' : lifeline).disabled = true;
+        resetTimer();
+        elements.messageEl.textContent = '';
+        enableLifelines();
+        gameState.fiftyFiftyUsed = false;
+        gameState.lifelineUsedThisQuestion = false;
+    };
 
-    switch (lifeline) {
-        case 'friend':
-            messageEl.textContent = 'Tu amigo sugiere: ' + questions[currentQuestion].answers[questions[currentQuestion].correct];
-            break;
-        case 'audience':
-            const audienceHelp = generateAudienceHelp();
-            messageEl.textContent = 'Ayuda del público: A: ' + audienceHelp[0] + '%, B: ' + audienceHelp[1] + '%, C: ' + audienceHelp[2] + '%, D: ' + audienceHelp[3] + '%';
-            break;
-        case 'fiftyFifty':
-            const buttons = answersEl.getElementsByTagName('button');
-            let eliminated = 0;
-            for (let i = 0; i < buttons.length; i++) {
-                if (i !== questions[currentQuestion].correct && eliminated < 2) {
-                    buttons[i].style.display = 'none';
-                    eliminated++;
+    const selectAnswer = (index) => {
+        clearInterval(gameState.timer);
+        const question = gameQuestions[gameState.currentQuestion];
+        const buttons = elements.answersEl.getElementsByTagName('button');
+
+        if (index === question.correct) {
+            gameState.score += question.level * 1000;
+            updateScore();
+            buttons[index].classList.add('correct');
+            elements.messageEl.textContent = '¡Correcto!';
+            setTimeout(() => {
+                if (confirm('¡Respuesta correcta! ¿Quieres continuar jugando?')) {
+                    gameState.currentQuestion++;
+                    updateLevel();
+                    nextQuestion();
+                } else {
+                    endGame();
+                }
+            }, 1500);
+        } else {
+            buttons[index].classList.add('incorrect');
+            buttons[question.correct].classList.add('correct');
+            elements.messageEl.textContent = 'Incorrecto. La respuesta correcta era: ' + question.answers[question.correct];
+            setTimeout(endGame, 2000);
+        }
+
+        Array.from(buttons).forEach(button => button.disabled = true);
+    };
+
+    const resetTimer = () => {
+        clearInterval(gameState.timer);
+        gameState.timeLeft = 45;
+        elements.timerEl.textContent = gameState.timeLeft;
+        gameState.timer = setInterval(() => {
+            if (!gameState.isLifelineActive) {
+                gameState.timeLeft--;
+                elements.timerEl.textContent = gameState.timeLeft;
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    elements.messageEl.textContent = '¡Se acabó el tiempo!';
+                    endGame();
                 }
             }
-            break;
-        case 'changeQuestion':
-            currentQuestion++;
-            if (currentQuestion >= questions.length) {
-                currentQuestion = 0;
-            }
-            nextQuestion();
-            break;
-    }
-}
+        }, 1000);
+    };
 
-// deshabilitar
-function generateAudienceHelp() {
-    const correct = questions[currentQuestion].correct;
-    const percentages = [0, 0, 0, 0];
-    percentages[correct] = Math.floor(Math.random() * 30) + 40; // 40-70% for correct answer
-    const remaining = 100 - percentages[correct];
-    for (let i = 0; i < 4; i++) {
-        if (i !== correct) {
-            percentages[i] = i === 3 ? remaining : Math.floor(Math.random() * remaining);
+    const updateScore = () => {
+        elements.scoreEl.textContent = gameState.score;
+    };
+
+    const updateLevel = () => {
+        elements.levelEl.textContent = gameState.currentQuestion < gameQuestions.length ? gameQuestions[gameState.currentQuestion].level : 3;
+    };
+
+    const endGame = () => {
+        clearInterval(gameState.timer);
+        elements.gameArea.classList.add('hidden');
+        elements.endScreen.classList.remove('hidden');
+        elements.finalScoreEl.textContent = `Tu puntuación final es: $${gameState.score}`;
+        pauseBackgroundMusic();
+    };
+
+    const quitGame = () => {
+        if (confirm('¿Estás seguro de que quieres retirarte?')) {
+            endGame();
         }
-    }
-    return percentages;
-}
+    };
 
-//MUSICA
-document.addEventListener("DOMContentLoaded", function () {
-    const audio = document.getElementById("background-music");
-    const toggleAudioButton = document.getElementById("toggle-audio");
-    const startGameButton = document.getElementById("start-game");
-    const quitGameButton = document.getElementById("quit-game"); // Botón "Retirarse"
-    let isAudioPlaying = false;
+    const enableLifelines = () => {
+        document.querySelectorAll('.lifeline').forEach(button => {
+            const lifeline = button.id;
+            button.disabled = gameState.lifelinesUsed[lifeline] || gameState.lifelineUsedThisQuestion;
+        });
+    };
 
-    // Iniciar el juego y la música cuando el usuario haga clic en "Iniciar Juego"
-    startGameButton.addEventListener("click", function () {
-        audio.play().then(() => {
-            isAudioPlaying = true;
-            toggleAudioButton.textContent = '🔊'; 
+    const useLifeline = (lifeline) => {
+        if (gameState.lifelineUsedThisQuestion) {
+            alert('Ya has usado un comodín en esta pregunta.');
+            return;
+        }
+
+        gameState.lifelinesUsed[lifeline] = true;
+        gameState.lifelineUsedThisQuestion = true;
+        document.getElementById(lifeline).disabled = true;
+
+        // Reducir el puntaje
+        gameState.score = Math.max(0, gameState.score - LIFELINE_COST);
+        updateScore();
+
+        switch (lifeline) {
+            case 'friend':
+                gameState.timeLeft += 25; // Añadir 25 segundos al contador
+                elements.timerEl.textContent = gameState.timeLeft; // Actualizar el contador en la interfaz
+                break;
+            case 'audience':
+                gameState.isLifelineActive = true;
+                elements.lifelineActions.classList.remove('hidden');
+                break;
+            case 'fifty-fifty':
+                const buttons = elements.answersEl.getElementsByTagName('button');
+                let eliminated = 0;
+                for (let i = 0; i < buttons.length; i++) {
+                    if (i !== gameQuestions[gameState.currentQuestion].correct && eliminated < 2) {
+                        buttons[i].style.display = 'none';
+                        eliminated++;
+                    }
+                }
+                gameState.fiftyFiftyUsed = true;
+                break;
+            case 'change-question':
+                gameState.currentQuestion++;
+                if (gameState.currentQuestion >= gameQuestions.length) {
+                    gameState.currentQuestion = 0;
+                }
+                nextQuestion();
+                break;
+        }
+
+        enableLifelines(); // Deshabilitar los demás comodines después de usar uno
+    };
+
+    const acceptLifeline = () => {
+        gameState.isLifelineActive = false;
+        elements.lifelineActions.classList.add('hidden');
+        elements.lifelineMessage.textContent = '';
+    };
+
+    const playBackgroundMusic = () => {
+        elements.audio.play().then(() => {
+            elements.toggleAudioButton.textContent = '🔊';
         }).catch(error => {
             console.error("Error al intentar reproducir la música: ", error);
         });
-    });
+    };
 
-    toggleAudioButton.addEventListener("click", function () {
-        if (isAudioPlaying) {
-            audio.pause();
-            toggleAudioButton.textContent = '🔇';
+    const pauseBackgroundMusic = () => {
+        elements.audio.pause();
+        elements.toggleAudioButton.textContent = '🔇';
+    };
+
+    const toggleBackgroundMusic = () => {
+        if (elements.audio.paused) {
+            playBackgroundMusic();
         } else {
-            audio.play().then(() => {
-                toggleAudioButton.textContent = '🔊';
-            }).catch(error => {
-                console.error("Error al intentar reproducir la música: ", error);
-            });
+            pauseBackgroundMusic();
         }
-        isAudioPlaying = !isAudioPlaying;
-    });
+    };
 
-    quitGameButton.addEventListener("click", function () {
-        if (isAudioPlaying) {
-            audio.pause();
-            isAudioPlaying = false; 
-            toggleAudioButton.textContent = '🔇'; 
-        }
+    // Event Listeners
+    elements.startButton.addEventListener('click', startGame);
+    elements.quitButton.addEventListener('click', quitGame);
+    elements.playAgainButton.addEventListener('click', startGame);
+    elements.toggleAudioButton.addEventListener('click', toggleBackgroundMusic);
+    elements.acceptLifeline.addEventListener('click', acceptLifeline);
+
+    document.querySelectorAll('.lifeline').forEach(button => {
+        button.addEventListener('click', () => useLifeline(button.id));
     });
 });
-

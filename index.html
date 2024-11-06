@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¿Quién Quiere Ser Programador Millonario?</title>
     <link rel="stylesheet" href="css/styles.css">
-
 </head>
-
 <body>
     <audio id="background-music" loop>
         <source src="music/MainTheme.mp3" type="audio/mpeg">
         Tu navegador no soporta el elemento de audio.
     </audio>
     <div id="audio-controls">
-        <button id="toggle-audio">🔊</button>
+        <button id="toggle-audio" aria-label="Alternar música">🔇</button>
     </div>
-    <div id="game-container">
+    <main id="game-container">
         <h1>¿Quién Quiere Ser Programador Millonario?</h1>
-        <div id="game-area" style="display: none;">
+        <section id="start-screen" class="center-content">
+            <button id="start-game">Iniciar Juego</button>
+        </section>
+        <section id="game-area" class="hidden">
             <div id="question-container">
-                <p id="question"></p>
+                <p id="question" aria-live="polite"></p>
                 <div id="answers"></div>
             </div>
             <div id="info-panel">
@@ -30,26 +30,27 @@
                 <div id="level">Nivel: <span id="level-value">1</span></div>
             </div>
             <div id="lifelines">
-                <button id="friend">👥 Llamar a un Amigo</button>
-                <button id="audience">📊 Ayuda del Público</button>
-                <button id="fifty-fifty">50:50</button>
-                <button id="change-question">🔄 Cambiar Pregunta</button>
+                <button id="friend" class="lifeline">👥 Llamar a un Amigo</button>
+                <button id="audience" class="lifeline">📊 Ayuda del Público</button>
+                <button id="fifty-fifty" class="lifeline">50:50</button>
+                <button id="change-question" class="lifeline">🔄 Cambiar Pregunta</button>
+            </div>
+            <div id="lifeline-actions" class="hidden">
+                <p id="lifeline-message"></p>
+                <button id="accept-lifeline">Aceptar</button>
             </div>
             <div id="game-controls">
                 <button id="quit-game">Retirarse</button>
             </div>
-            <div id="message"></div>
-        </div>
-        <div id="start-screen">
-            <button id="start-game">Iniciar Juego</button>
-        </div>
-        <div id="end-screen" style="display: none;">
+            <div id="message" aria-live="assertive"></div>
+        </section>
+        <section id="end-screen" class="hidden">
             <h2>Juego Terminado</h2>
             <p id="final-score"></p>
             <button id="play-again">Jugar de Nuevo</button>
-        </div>
-    </div>
+        </section>
+    </main>
     <script src="js/index.js"></script>
+    <script src="js/questions.js"></script>
 </body>
-
 </html>
