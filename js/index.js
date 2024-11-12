@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const nextQuestion = () => {
+        enableLifelines();
         if (gameState.currentQuestion >= gameQuestions.length) {
             endGame();
             return;
@@ -173,6 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+         // Verificar si el puntaje es mayor o igual a 300
+    if (gameState.score >= 300) {
         gameState.lifelinesUsed[lifeline] = true;
         gameState.lifelineUsedThisQuestion = true;
         document.getElementById(lifeline).disabled = true;
@@ -211,7 +214,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         enableLifelines(); // Deshabilitar los demás comodines después de usar uno
-    };
+    } else {
+        // Si el puntaje es menor a 300, mostrar un mensaje y no permitir usar el comodín
+        alert('Debes tener al menos $300 para poder usar un comodín.');
+    }
+};
 
     const acceptLifeline = () => {
         gameState.isLifelineActive = false;
